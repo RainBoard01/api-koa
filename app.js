@@ -1,19 +1,19 @@
 const Koa = require('koa');
-const bodyParser = require('koa-bodyparser');
-const { errorHandler, execute } = require('graphql-api-koa');
-const mongoose = require('mongoose');
-const uri = "mongodb+srv://rainboard:.Amdapua45300@graphql-rn775.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const mount = require('koa-mount');
 const cors = require('@koa/cors');
+const graphqlHTTP = require('koa-graphql');
+
 const schema = require('./schema');
+const dbInit = require('./database');
+const PORT = process.env.PORT || 4000;
 
-mongoose.connect(uri, { useNewUrlParser: true });
-mongoose.connection.once('open', () => console.log("DB connected"));
-
-const app = new Koa()
-    .use(errorHandler())
-    .use(bodyParser())
-    .use(execute({ schema }));
+const app = new Koa();
 
 app.use(cors());
+app.use(mount('/graphql', graphqlHTTP({
+    schema: schema,
+    graphiql: true,
+})));
 
-app.listen(4000, () => console.log('Listening on Port 4000'));
+dbInit();
+app.listen(PORT, () => console.log(`Running on port ${ PORT }`));
