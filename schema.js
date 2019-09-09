@@ -2,7 +2,7 @@ const graphql = require('graphql');
 const _ = require('lodash');
 const Book = require('./models/book');
 const Author = require('./models/author');
-const { 
+const {
     GraphQLObjectType,
     GraphQLString, 
     GraphQLSchema,
@@ -23,7 +23,8 @@ const BookType = new GraphQLObjectType({
             resolve(parent, args) {
                 return Author.findById(parent.authorId);
             }
-        }
+        },
+        image: { type: GraphQLString }
     })
 });
 
@@ -100,13 +101,15 @@ const Mutation = new GraphQLObjectType({
             args: {
                 name: { type: new GraphQLNonNull(GraphQLString) },
                 genre: { type: new GraphQLNonNull(GraphQLString) },
-                authorId: { type: new GraphQLNonNull(GraphQLID) }
+                authorId: { type: new GraphQLNonNull(GraphQLID) },
+                image: { type: new GraphQLNonNull(GraphQLString) },
             },
             resolve(parent, args) {
                 let book = new Book({
                     name: args.name,
                     genre: args.genre,
-                    authorId: args.authorId
+                    authorId: args.authorId,
+                    image: args.image
                 });
                 return book.save();
             }
